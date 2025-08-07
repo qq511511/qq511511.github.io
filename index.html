@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>春秋 - 远程注入</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    /* 页面整体样式 */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4; /* 浅灰色背景 */
+    }
+
+    /* 悬浮窗整体样式 */
+    #floatingWindow {
+      position: fixed;
+      right: 20px;
+      bottom: 110px;
+      width: 300px;
+      background-color: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      padding: 15px;
+      color: #333;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+   .function-group {
+      margin-bottom: 15px;
+      border-bottom: 1px dashed #ccc; /* 添加虚线分割线 */
+      padding-bottom: 10px; /* 分割线下留出一些空间 */
+    }
+
+   .function-group:last-child {
+      border-bottom: none; /* 最后一个功能组去掉分割线 */
+    }
+
+   .section-title {
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #007BFF; /* 标题颜色 */
+      text-transform: uppercase;
+      position: relative;
+    }
+
+   .section-title::before {
+      content: "\f0e7"; /* 添加一个小图标作为装饰 */
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      margin-right: 5px;
+      color: #007BFF;
+    }
+
+   .function-item {
+      display: inline-block;
+      margin: 5px;
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 5px;
+      padding: 8px 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+   .function-item:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    input[type="checkbox"] {
+      margin-right: 5px;
+    }
+
+    input[type="range"] {
+      width: 200px;
+      margin-bottom: 10px;
+    }
+
+    button {
+      position: fixed;
+      right: 10px;
+      bottom: 10px;
+      padding: 8px 16px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+   .function-item:before {
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      margin-right: 5px;
+    }
+
+   .function-item#ray:before { content: "\f0e7"; }
+   .function-item#box:before { content: "\f10c"; }
+   .function-item#hp:before { content: "\f4c4"; }
+   .function-item#nickname:before { content: "\f2bd"; }
+   .function-item#team:before { content: "\f0c8"; }
+   .function-item#distance:before { content: "\f0de"; }
+   .function-item#skeleton:before { content: "\f5d1"; }
+   .function-item#radar:before { content: "\f58a"; }
+   .function-item#wideAngle:before { content: "\f03e"; }
+   .function-item#grenade:before { content: "\f42e"; }
+   .function-item#vehicle:before { content: "\f68c"; }
+   .function-item#box2:before { content: "\f464"; }
+   .function-item#backEnemy:before { content: "\f0e2"; }
+   .function-item#crosshair:before { content: "\f612"; }
+   .function-item#throw:before { content: "\f431"; }
+   .function-item#itemInfo:before { content: "\f575"; }
+   .function-item#noRayBot:before { content: "\f0c0"; }
+   .function-item#antiNet1:before { content: "\f0ac"; }
+   .function-item#antiNet2:before { content: "\f0ac"; }
+   .function-item#antiDetect:before { content: "\f06e"; }
+   .function-item#antiBan10:before { content: "\f023"; }
+   .function-item#antiSpeedBan:before { content: "\f050"; }
+   .function-item#antiTraceBan:before { content: "\f06e"; }
+
+    /* 新增文字样式 */
+   .main-text {
+      text-align: center;
+      margin-top: 50px;
+      color: #333;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 新增的文字内容 -->
+  <div class="main-text">
+    <h1>欢迎使用春秋远程注入</h1>
+    <p>点击功能后开启游戏即可使用功能</p>
+  </div>
+
+  <div id="floatingWindow">
+    <div class="function-group">
+      <h3 class="section-title">绘制功能</h3>
+      <div class="function-item"><input type="checkbox" id="ray">人物骨骼</div>
+      <div class="function-item"><input type="checkbox" id="box">人物方框</div>
+      <div class="function-item"><input type="checkbox" id="hp">人物血量</div>
+      <div class="function-item"><input type="checkbox" id="nickname">人物昵称</div>
+      <div class="function-item"><input type="checkbox" id="team">身后预警</div>
+      <div class="function-item"><input type="checkbox" id="distance">距离显示</div>
+      <div class="function-item"><input type="checkbox" id="gma">手雷预警</div>
+      <div class="function-item"><input type="checkbox" id="logo">被瞄预警</div>
+    </div>
+
+    <div class="function-group">
+      <h3 class="section-title">武器功能</h3>
+      <div class="function-item"><input type="checkbox" id="skeleton">全屏自瞄</div>
+      <div class="function-item"><input type="checkbox" id="radar">坐标追踪</div>
+      <div class="function-item"><input type="checkbox" id="longo">视野追踪</div>
+      <div class="function-item"><input type="checkbox" id="wideAngle">防抖无后</div>
+      <div class="function-item"><input type="checkbox" id="grenade">十字据点</div>
+      <div class="function-item"><input type="checkbox" id="lognsndjo">自改射速</div>
+      <div class="function-item"><input type="checkbox" id="lnnnalkogo">六道仙人</div>
+      <div class="function-item"><input type="checkbox" id="logmaljydyduo">狙击连点</div>
+    </div>
+
+    <div class="function-group">
+      <h3 class="section-title">其他功能</h3>
+      <div class="function-item"><input type="checkbox" id="backEnemy">高铁加速</div>
+      <div class="function-item"><input type="checkbox" id="crosshair">轻微加速</div>
+      <div class="function-item"><input type="checkbox" id="throw">探头路飞</div>
+      <div class="function-item"><input type="checkbox" id="itemInfo">趴下高跳</div>
+      <div class="function-item"><input type="checkbox" id="noRayBot">自改广角</div>
+      <div class="function-item"><input type="checkbox" id="loyuwgo">攀爬穿墙</div>
+    </div>
+    
+    <div class="function-group">
+      <h3 class="section-title">娱乐功能</h3>
+      <div class="function-item"><input type="checkbox" id="lagogo">人物大头</div>
+      <div class="function-item"><input type="checkbox" id="logmmmmo">普京比例</div>
+      <div class="function-item"><input type="checkbox" id="loiigo">人物淫叫</div>
+      <div class="function-item"><input type="checkbox" id="lklogo">头顶光环</div>
+      <div class="function-item"><input type="checkbox" id="lobbgo">万年魂环</div>
+      <div class="function-item"><input type="checkbox" id="lpogo">纸片人物</div>
+      <div class="function-item"><input type="checkbox" id="lonnbufdkvgo">标点传送</div>
+      <div class="function-item"><input type="checkbox" id="loglkayo">人物自杀</div>
+      <div class="function-item"><input type="checkbox" id="lnnammsjogo">马可波罗</div>
+      <div class="function-item"><input type="checkbox" id="loamdjdjgo">角色去衣</div>
+     </div>
+
+    <div class="function-group">
+      <h3 class="section-title">调试功能</h3>
+      <input type="range" min="0" max="100" value="100" id="distanceDebug">
+      <span id="distanceDebugValue">广角大小100</span><br>
+      <input type="range" min="0" max="100" value="100" id="radarSize">
+      <span id="radarSizeValue">枪械射速100</span>
+    </div>
+
+    <div class="function-group">
+      <h3 class="section-title">全防功能</h3>
+      <div class="function-item"><input type="checkbox" id="antiNet1">防止禁网</div>
+      <div class="function-item"><input type="checkbox" id="antiNet2">防止标记</div>
+      <div class="function-item"><input type="checkbox" id="antiDetect">去除检测</div>
+      <div class="function-item"><input type="checkbox" id="antiBan10">防止人工</div>
+      <div class="function-item"><input type="checkbox" id="antiSpeedBan">全局离线</div>
+      <div class="function-item"><input type="checkbox" id="antiTraceBan">防止闪退</div>
+    </div>
+  </div>
+
+  <script>
+    const distanceDebug = document.getElementById('distanceDebug');
+    const distanceDebugValue = document.getElementById('distanceDebugValue');
+    distanceDebug.addEventListener('input', function () {
+      distanceDebugValue.textContent = `广角大小${this.value}`;
+    });
+
+    const radarSize = document.getElementById('radarSize');
+    const radarSizeValue = document.getElementById('radarSizeValue');
+    radarSize.addEventListener('input', function () {
+      radarSizeValue.textContent = `枪械射速${this.value}`;
+    });
+
+    window.onload = function () {
+      distanceDebugValue.textContent = `广角大小100`;
+      radarSizeValue.textContent = `枪械射速100`;
+    };
+
+    function debugFunction() {
+      let message = "已选中的功能：\n";
+      const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach((checkbox) => {
+        if (checkbox.checked) {
+          message += checkbox.id + "\n";
+        }
+      });
+      alert(message);
+    }
+  </script>
+</body>
+
+</html>
